@@ -6,8 +6,28 @@
   "author": "kotofeyskaya",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/preset-typescript": "^7.21.0",
+    "@storybook/addon-actions": "^7.0.0-rc.9",
+    "@storybook/addon-essentials": "^7.0.0-rc.9",
+    "@storybook/addon-interactions": "^7.0.0-rc.9",
+    "@storybook/addon-links": "^7.0.0-rc.9",
+    "@storybook/addon-mdx-gfm": "^7.0.0-rc.9",
+    "@storybook/react": "^7.0.0-rc.9",
+    "@storybook/react-webpack5": "^7.0.0-rc.9",
+    "@storybook/testing-library": "^0.0.14-next.1",
     "@types/react": "^18.0.31",
+    "babel-loader": "^8.3.0",
     "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.0.0-rc.9",
     "typescript": "^5.0.2"
-  }
+  },
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {}
 }
