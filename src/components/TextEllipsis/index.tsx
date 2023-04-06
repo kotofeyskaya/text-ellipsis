@@ -1,4 +1,4 @@
-import {useLayoutEffect, useMemo, useRef, useState} from 'react'
+import {useCallback, useLayoutEffect, useMemo, useRef, useState} from 'react'
 
 type TextEllipsisProps = {
     children: string
@@ -14,8 +14,9 @@ const TextEllipsis = ({children, tailLength, title, className}: TextEllipsisProp
     const childrenWidthRef = useRef<number>()
     const timeout = useRef<ReturnType<typeof setTimeout>>()
 
-    const [text, setText] = useState(children)
-    const [isTitleVisible, setIsTitleVisible] = useState(false)
+    const [prefix, setPrefix] = useState('')
+    const [hiddenText, setHiddenText] = useState('')
+    const [postfix, setPostfix] = useState('')
 
     const context = useMemo(() => {
         const canvas = document.createElement('canvas')
@@ -46,15 +47,23 @@ const TextEllipsis = ({children, tailLength, title, className}: TextEllipsisProp
                 const fittingTextLength = containerWidth / charSize
 
                 if (childrenWidth > containerWidth) {
-                    const truncatedText = postfix.length >= fittingTextLength
-                        ? `...${children.substring(children.length - fittingTextLength)}`
-                        : `${children.substring(0, fittingTextLength - postfix.length - 3)}...${postfix}`
+                    if (postfix.length >= fittingTextLength) {
+                        const middleIndex = children.length - fittingTextLength
 
-                    setText(truncatedText)
-                    setIsTitleVisible(true)
+                        setPrefix('')
+                        setHiddenText(children.substring(0, middleIndex))
+                        setPostfix(children.substring(middleIndex))
+                    } else {
+                        const middleIndex = fittingTextLength - postfix.length - 3
+
+                        setPrefix(children.substring(0, middleIndex))
+                        setHiddenText(children.substring(middleIndex, children.length - tailLength))
+                        setPostfix(postfix)
+                    }
                 } else {
-                    setText(children)
-                    setIsTitleVisible(false)
+                    setPrefix(children)
+                    setPostfix('')
+                    setHiddenText('')
                 }
             }, 100)
         }
@@ -70,13 +79,24 @@ const TextEllipsis = ({children, tailLength, title, className}: TextEllipsisProp
         }
     }, [children, tailLength, context])
 
+    const handleCopy: ClipboardEventHandler = (event) => {
+        event.preventDefault()
+        event.clipboardData.setData('text/plain', window.getSelection().toString().split('\n')[0])
+    }
+
     return (
         <div ref={containerRef}
-             style={{whiteSpace: 'nowrap'}}
+             style={{display: 'flex', whiteSpace: 'nowrap'}}
              className={className}
-             title={isTitleVisible ? title : ''}
+             title={hiddenText ? title : ''}
+             onCopy={handleCopy}
         >
-            {text}
+                <span>
+                    {prefix}
+                    <span style={{fontSize: 0}}>{hiddenText}{postfix}</span>
+                </span>
+            {hiddenText && <span style={{userSelect: 'none'}}>...</span>}
+            {postfix}
         </div>
     )
 }
