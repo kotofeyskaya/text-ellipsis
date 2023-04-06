@@ -1,4 +1,4 @@
-import {useCallback, useLayoutEffect, useMemo, useRef, useState} from 'react'
+import {useLayoutEffect, useMemo, useRef, useState} from 'react'
 
 type TextEllipsisProps = {
     children: string
