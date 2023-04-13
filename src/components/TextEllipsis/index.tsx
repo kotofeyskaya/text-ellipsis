@@ -12,7 +12,6 @@ const isString = (data: unknown): data is string => typeof data === 'string'
 const TextEllipsis = ({children, tailLength, title, className}: TextEllipsisProps) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const childrenWidthRef = useRef<number>()
-    const timeout = useRef<ReturnType<typeof setTimeout>>()
 
     const [prefix, setPrefix] = useState('')
     const [hiddenText, setHiddenText] = useState('')
@@ -36,45 +35,38 @@ const TextEllipsis = ({children, tailLength, title, className}: TextEllipsisProp
 
         const childrenWidth = childrenWidthRef.current
 
-        const action = () => {
-            timeout.current && clearTimeout(timeout.current)
+        const action: ResizeObserverCallback = (entries) => {
+            const postfix = children.substring(children.length - tailLength)
+            const containerWidth = entries[0].contentRect.width
 
-            timeout.current = setTimeout(() => {
-                const postfix = children.substring(children.length - tailLength)
-                const containerWidth = current.getBoundingClientRect().width
+            const charSize = childrenWidth / children.length
+            const fittingTextLength = containerWidth / charSize
 
-                const charSize = childrenWidth / children.length
-                const fittingTextLength = containerWidth / charSize
+            if (childrenWidth > containerWidth) {
+                if (postfix.length >= fittingTextLength) {
+                    const middleIndex = children.length - fittingTextLength
 
-                if (childrenWidth > containerWidth) {
-                    if (postfix.length >= fittingTextLength) {
-                        const middleIndex = children.length - fittingTextLength
-
-                        setPrefix('')
-                        setHiddenText(children.substring(0, middleIndex))
-                        setPostfix(children.substring(middleIndex))
-                    } else {
-                        const middleIndex = fittingTextLength - postfix.length - 3
-
-                        setPrefix(children.substring(0, middleIndex))
-                        setHiddenText(children.substring(middleIndex, children.length - tailLength))
-                        setPostfix(postfix)
-                    }
+                    setPrefix('')
+                    setHiddenText(children.substring(0, middleIndex))
+                    setPostfix(children.substring(middleIndex))
                 } else {
-                    setPrefix(children)
-                    setPostfix('')
-                    setHiddenText('')
+                    const middleIndex = fittingTextLength - postfix.length - 3
+
+                    setPrefix(children.substring(0, middleIndex))
+                    setHiddenText(children.substring(middleIndex, children.length - tailLength))
+                    setPostfix(postfix)
                 }
-            }, 100)
+            } else {
+                setPrefix(children)
+                setHiddenText('')
+                setPostfix('')
+            }
         }
 
         const observer = new ResizeObserver(action)
         observer.observe(current)
 
-        action()
-
         return () => {
-            timeout.current && clearTimeout(timeout.current)
             observer.disconnect()
         }
     }, [children, tailLength, context])
