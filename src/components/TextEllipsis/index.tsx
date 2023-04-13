@@ -14,10 +14,7 @@ const TextEllipsis = ({children, tailLength, title, className}: TextEllipsisProp
     const containerRef = useRef<HTMLDivElement>(null)
     const childrenWidthRef = useRef<number>()
 
-    const [prefix, setPrefix] = useState('')
-    const [hiddenText, setHiddenText] = useState('')
-    const [postfix, setPostfix] = useState('')
-
+    const [text, setText] = useState({prefix: '', hidden: '', postfix: ''})
     const [hasOverflow, setHasOverflow] = useState(false)
 
     const context = useMemo(() => {
@@ -53,16 +50,18 @@ const TextEllipsis = ({children, tailLength, title, className}: TextEllipsisProp
 
             if (postfix.length >= fittingTextLength) {
                 const middleIndex = children.length - fittingTextLength
-
-                setPrefix('')
-                setHiddenText(children.substring(0, middleIndex))
-                setPostfix(children.substring(middleIndex))
+                setText({
+                    prefix: '',
+                    hidden: children.substring(0, middleIndex),
+                    postfix: children.substring(middleIndex)
+                })
             } else {
                 const middleIndex = fittingTextLength - postfix.length - 3
-
-                setPrefix(children.substring(0, middleIndex))
-                setHiddenText(children.substring(middleIndex, children.length - tailLength))
-                setPostfix(postfix)
+                setText({
+                    prefix: children.substring(0, middleIndex),
+                    hidden: children.substring(middleIndex, children.length - tailLength),
+                    postfix: postfix
+                })
             }
         }
 
@@ -84,11 +83,11 @@ const TextEllipsis = ({children, tailLength, title, className}: TextEllipsisProp
                     ? <span className={styles.ellipsis}>{children}</span>
                     : (
                         <span>
-                            {prefix}
-                            <span className={hiddenText ? styles.hiddenWrapper : undefined}>
-                                <span className={styles.hiddenText}>{hiddenText}</span>
+                            {text.prefix}
+                            <span className={text.hidden ? styles.hiddenWrapper : undefined}>
+                                <span className={styles.hiddenText}>{text.hidden}</span>
                             </span>
-                            {postfix}
+                            {text.postfix}
                         </span>
                     )
             }
