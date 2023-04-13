@@ -32,7 +32,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "storybook": "^7.0.0-rc.9",
-    "typescript": "*"
+    "typescript": "*",
+    "typescript-plugin-css-modules": "^5.0.1"
   },
   "scripts": {
     "storybook": "storybook dev -p 6006",
