@@ -1,0 +1,17 @@
+.container {
+    display: flex;
+    white-space: nowrap;
+}
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hiddenText {
+    font-size: 0;
+}
+
+.hiddenWrapper::after {
+    content: '...';
+}
